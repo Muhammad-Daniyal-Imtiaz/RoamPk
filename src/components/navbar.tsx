@@ -17,7 +17,7 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   return (
     <header className={cn("fixed inset-x-0 top-0 z-40 border-b border-white/10", dark ? "bg-[#101510]/90 text-white" : "glass")}>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">

@@ -82,7 +82,7 @@ export default function Home() {
               <p className="mt-3 text-white/75">No spam, unsubscribe anytime.</p>
             </div>
             <div className="flex min-w-0 flex-col gap-3 sm:flex-row md:min-w-[520px]">
-              <Input placeholder="Email address" className="bg-white" />
+              <Input placeholder="Email address" className="bg-white text-[#111511]" />
               <Button variant="secondary" size="lg">Subscribe</Button>
             </div>
           </div>
