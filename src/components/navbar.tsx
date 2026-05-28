@@ -27,7 +27,7 @@ export function Navbar() {
         </Link>
         <div className="hidden items-center gap-1 lg:flex">
           {links.map(([label, href]) => (
-            <Link key={href} href={href} className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-[#006600]/10 hover:text-[#006600]">
+            <Link key={href} href={href} className={cn("rounded-full px-4 py-2 text-sm font-semibold hover:bg-[#006600]/10 hover:text-[#006600]", dark ? "text-gray-200" : "text-gray-700")}>
               {label}
             </Link>
           ))}
@@ -43,7 +43,7 @@ export function Navbar() {
         </div>
       </nav>
       {open && (
-        <div className="mx-4 mb-4 grid gap-2 rounded-2xl bg-white p-4 shadow-xl lg:hidden">
+        <div className={cn("mx-4 mb-4 grid gap-2 rounded-2xl p-4 shadow-xl lg:hidden", dark ? "bg-[#1a201a] text-white" : "bg-white")}>
           {links.map(([label, href]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-semibold hover:bg-[#006600]/10">
               {label}

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ImageCard } from "@/components/cards";
-import { destinations, heroImages, testimonials } from "@/lib/mock-data";
+import { HeroCarousel } from "@/components/hero-carousel";
+import { destinations, testimonials } from "@/lib/mock-data";
 
 export default function Home() {
   const features: [LucideIcon, string, string][] = [
@@ -19,9 +20,8 @@ export default function Home() {
   return (
     <main>
       <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 pt-20 text-center text-white">
-        <img src={heroImages.hunza} alt="Hunza Valley" className="absolute inset-0 -z-20 h-full w-full object-cover" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/35 to-black/80" />
-        <MotionDiv initial={{ opacity: 0, y: 34 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-5xl">
+        <HeroCarousel />
+        <MotionDiv initial={{ opacity: 0, y: 34 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-5xl z-20">
           <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-[2rem] bg-white/15 text-2xl font-black backdrop-blur">PK</div>
           <h1 className="text-6xl font-black tracking-tight md:text-8xl">RoamPK</h1>
           <p className="mt-5 text-xl font-semibold md:text-2xl">Your All-in-One Pakistan Travel Companion</p>

@@ -87,11 +87,11 @@ export const tourGuides = [
 ];
 
 export const destinations = [
-  { id: "hunza", name: "Hunza Valley", image: heroImages.hunza, rating: 4.9, price: 15000, bestTime: "April–October" },
+  { id: "nanga-parbat", name: "Nanga Parbat", image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=85", rating: 5.0, price: 20000, bestTime: "June–August" },
+  { id: "fairy-meadows", name: "Fairy Meadows", image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=85", rating: 4.9, price: 18000, bestTime: "June–September" },
+  { id: "hunza", name: "Hunza Valley", image: "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1400&q=85", rating: 4.9, price: 15000, bestTime: "April–October" },
   { id: "skardu", name: "Skardu", image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=85", rating: 4.8, price: 18000, bestTime: "May–September" },
-  { id: "naran", name: "Naran Kaghan", image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=85", rating: 4.7, price: 12000, bestTime: "June–September" },
   { id: "lahore", name: "Lahore", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1400&q=85", rating: 4.8, price: 9000, bestTime: "October–March" },
-  { id: "karachi", name: "Karachi", image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1400&q=85", rating: 4.5, price: 10000, bestTime: "November–February" },
   { id: "islamabad", name: "Islamabad", image: "https://images.unsplash.com/photo-1598027267707-47d936a1dd8a?auto=format&fit=crop&w=1400&q=85", rating: 4.7, price: 11000, bestTime: "March–May" },
 ];
 
