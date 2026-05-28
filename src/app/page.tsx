@@ -1,103 +1,93 @@
-import Image from "next/image";
+import Link from "next/link";
+import { BadgeDollarSign, BedDouble, Map, Phone, Quote, Route, Star, Users } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { MotionDiv } from "@/components/motion";
+import { Section } from "@/components/section";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ImageCard } from "@/components/cards";
+import { destinations, heroImages, testimonials } from "@/lib/mock-data";
 
 export default function Home() {
+  const features: [LucideIcon, string, string][] = [
+    [BedDouble, "Book Hotels", "500+ hotels across Pakistan"],
+    [Phone, "Get SIM Card", "Pre-order tourist SIM instantly"],
+    [BadgeDollarSign, "Exchange Currency", "Live rates from trusted partners"],
+    [Users, "Guided Tours", "Expert local guides for every destination"],
+  ];
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main>
+      <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 pt-20 text-center text-white">
+        <img src={heroImages.hunza} alt="Hunza Valley" className="absolute inset-0 -z-20 h-full w-full object-cover" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/35 to-black/80" />
+        <MotionDiv initial={{ opacity: 0, y: 34 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-5xl">
+          <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-[2rem] bg-white/15 text-2xl font-black backdrop-blur">PK</div>
+          <h1 className="text-6xl font-black tracking-tight md:text-8xl">RoamPK</h1>
+          <p className="mt-5 text-xl font-semibold md:text-2xl">Your All-in-One Pakistan Travel Companion</p>
+          <p className="mx-auto mt-5 max-w-3xl text-lg text-white/80">Book hotels, get tourist SIM cards, exchange currency, and discover guided tours — all in one place.</p>
+          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            <Link href="/hotels"><Button size="lg">Find Hotels</Button></Link>
+            <Link href="/sim"><Button variant="secondary" size="lg">Get Tourist SIM</Button></Link>
+            <Link href="/currency"><Button variant="secondary" size="lg">Check Exchange Rates</Button></Link>
+          </div>
+        </MotionDiv>
+      </section>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <Section title="Everything You Need for Stress-Free Travel">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {features.map(([Icon, title, text]) => (
+            <Card key={String(title)} className="p-2 hover:-translate-y-2 hover:shadow-2xl">
+              <CardContent>
+                <div className="mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-[#006600]/10 text-[#006600]"><Icon className="h-7 w-7" /></div>
+                <h3 className="text-xl font-black">{title}</h3>
+                <p className="mt-2 text-gray-500">{text}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </Section>
+
+      <Section title="Popular Destinations" subtitle="Handpicked icons of mountains, food, culture, coastline, and calm.">
+        <div className="grid gap-6 md:grid-cols-3">
+          {destinations.slice(0, 3).map((destination) => (
+            <ImageCard key={destination.id} image={destination.image} title={destination.name} meta={`${destination.rating}/5`} price={destination.price} href={`/destinations/${destination.id}`} />
+          ))}
+        </div>
+      </Section>
+
+      <Section title="What Travelers Say">
+        <div className="grid gap-6 md:grid-cols-3">
+          {testimonials.map((item) => (
+            <Card key={item.name} className="hover:-translate-y-2 hover:shadow-2xl">
+              <CardContent>
+                <Quote className="h-8 w-8 text-[#006600]" />
+                <p className="mt-4 text-lg font-semibold">“{item.quote}”</p>
+                <div className="mt-5 flex text-[#FFD700]">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}</div>
+                <div className="mt-6 flex items-center gap-3">
+                  <img src={item.image} alt={item.name} className="h-12 w-12 rounded-full object-cover" />
+                  <div><p className="font-bold">{item.name}</p><p className="text-sm text-gray-500">{item.country}</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
+      <Section className="py-20">
+        <div className="overflow-hidden rounded-[2rem] bg-[#006600] p-8 text-white shadow-2xl md:p-12">
+          <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <h2 className="text-3xl font-black md:text-5xl">Get Travel Tips & Exclusive Deals</h2>
+              <p className="mt-3 text-white/75">No spam, unsubscribe anytime.</p>
+            </div>
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row md:min-w-[520px]">
+              <Input placeholder="Email address" className="bg-white" />
+              <Button variant="secondary" size="lg">Subscribe</Button>
+            </div>
+          </div>
+        </div>
+      </Section>
+    </main>
   );
 }
