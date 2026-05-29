@@ -23,7 +23,7 @@ export function Navbar() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
         <Link href="/" className="flex items-center gap-2 text-2xl font-black tracking-tight">
           <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#006600] text-white shadow-lg shadow-green-900/20">PK</span>
-          RoamPK
+          Roam-PK
         </Link>
         <div className="hidden items-center gap-1 lg:flex">
           {links.map(([label, href]) => (
