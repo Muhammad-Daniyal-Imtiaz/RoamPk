@@ -42,7 +42,7 @@ export function HeroCarousel() {
   }, []);
 
   return (
-    <div className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-black">
+    <div className="absolute inset-0 z-0 h-full w-full overflow-hidden bg-black">
       {images.map((img, index) => (
         <motion.div
           key={img.src}

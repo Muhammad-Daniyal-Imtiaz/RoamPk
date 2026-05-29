@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Section } from "@/components/section";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,29 @@ export default function LanguagePage() {
         subtitle="Learn essential travel phrases in Urdu, Roman Urdu (English letters), Punjabi, and Pashto."
         className="max-w-6xl mx-auto"
       >
+        {/* Culture/Language Banner Card */}
+        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-black/90 via-black/40 to-transparent p-8 md:p-12 mb-12 min-h-[320px] flex items-center border border-white/10 shadow-2xl">
+          <Image
+            src="https://images.unsplash.com/photo-1605647540924-852290f6b0d5?auto=format&fit=crop&w=1200&q=80"
+            alt="Pakistani Culture & Languages"
+            fill
+            className="object-cover -z-10 object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#111511]/95 via-[#111511]/60 to-transparent -z-10" />
+          <div className="max-w-xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-400 mb-4 border border-green-500/30 uppercase tracking-wider">
+              Rich Cultural Heritage
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
+              Pakistan's Diverse Languages
+            </h2>
+            <p className="mt-4 text-base md:text-lg text-gray-300 leading-relaxed font-semibold">
+              Pakistan is a land of vibrant cultures and languages. From the calligraphic depth of Urdu script to the rhythmic flow of Roman Urdu, Punjabi, and Pashto, explore our rich linguistic landscape.
+            </p>
+          </div>
+        </div>
+
         {/* Search Bar */}
         <div className="relative mx-auto mb-12 max-w-2xl">
           <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400" />
