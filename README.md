@@ -8,9 +8,10 @@ RoamPK is a UI-first Pakistan Tourism Super-App demo built with Next.js, TypeScr
 - Hotels, SIM, currency, tours, guides, routes, destinations, emergency, language, and join/onboarding UI
 - Hardcoded mock data in `src/lib/mock-data.ts`
 - Extensible role model in `src/lib/roles.ts`
-- No production backend wired yet
+- Clerk auth routes and protected dashboard/onboarding
+- Turso + Drizzle schema and generated migration
 
-## Future Auth + Database Plan
+## Auth + Database
 
 Use **Clerk** for identity and **Turso** for app data.
 
@@ -29,6 +30,24 @@ Turso should manage:
 - Verification status
 - Follows
 - Bookings and marketplace data
+
+## Environment
+
+Create `.env.local` using `.env.example`:
+
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_replace_me
+CLERK_SECRET_KEY=sk_test_replace_me
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/dashboard
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/onboarding
+
+TURSO_DATABASE_URL=libsql://your-database-org.turso.io
+TURSO_AUTH_TOKEN=replace_me
+```
+
+Without Turso env vars, local server code falls back to `file:local.db` for development/build safety.
 
 ## Supported Roles
 
@@ -53,6 +72,26 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+## Database
+
+Generate migrations:
+
+```bash
+npm run db:generate
+```
+
+Apply migrations to Turso:
+
+```bash
+npm run db:migrate
+```
+
+Open Drizzle Studio:
+
+```bash
+npm run db:studio
+```
 
 ## Build
 
