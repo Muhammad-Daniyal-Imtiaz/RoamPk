@@ -33,7 +33,6 @@ const routes = {
     include: ['/*'],
     exclude: [
         '/_next/static/*',
-        '/_next/image*',
         '/favicon.ico',
         '/*.svg',
         '/*.png',
