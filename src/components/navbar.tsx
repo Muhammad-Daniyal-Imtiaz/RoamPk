@@ -13,6 +13,7 @@ const links = [
   ["Tours", "/tours"],
   ["Emergency", "/emergency"],
   ["Language", "/language"],
+  ["Join", "/join"],
 ];
 
 export function Navbar() {
@@ -36,7 +37,9 @@ export function Navbar() {
           <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} aria-label="Toggle dark mode">
             <Moon className="h-4 w-4" />
           </Button>
-          <Button className="hidden sm:inline-flex" size="sm">Plan Trip</Button>
+          <Link href="/join" className="hidden sm:block">
+            <Button size="sm">Join RoamPK</Button>
+          </Link>
           <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Open menu">
             {open ? <X /> : <Menu />}
           </button>
