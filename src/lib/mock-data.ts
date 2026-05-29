@@ -87,12 +87,12 @@ export const tourGuides = [
 ];
 
 export const destinations = [
-  { id: "faisal-mosque", name: "Faisal Mosque", image: "https://images.unsplash.com/photo-1627839352924-f7c8f00030a5?auto=format&fit=crop&w=1400&q=85", rating: 5.0, price: 5000, bestTime: "All Year" },
-  { id: "badshahi-mosque", name: "Badshahi Mosque", image: "https://images.unsplash.com/photo-1602717724357-a37a7cd9a4af?auto=format&fit=crop&w=1400&q=85", rating: 4.9, price: 4000, bestTime: "October–March" },
-  { id: "hunza", name: "Hunza Valley", image: "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1400&q=85", rating: 4.9, price: 15000, bestTime: "April–October" },
-  { id: "skardu", name: "Skardu & Gilgit", image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=85", rating: 4.8, price: 18000, bestTime: "May–September" },
-  { id: "islamabad", name: "Islamabad Beauty", image: "https://images.unsplash.com/photo-1598027267707-47d936a1dd8a?auto=format&fit=crop&w=1400&q=85", rating: 4.8, price: 8000, bestTime: "All Year" },
-  { id: "khunjerab", name: "Khunjerab (Pak-China Border)", image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1400&q=85", rating: 5.0, price: 22000, bestTime: "May–October" },
+  { id: "faisal-mosque", name: "Faisal Mosque", image: "https://images.unsplash.com/photo-1598027267707-47d936a1dd8a?auto=format&fit=crop&w=1200&q=70", rating: 5.0, price: 5000, bestTime: "All Year" },
+  { id: "badshahi-mosque", name: "Badshahi Mosque", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=70", rating: 4.9, price: 4000, bestTime: "October–March" },
+  { id: "hunza", name: "Hunza Valley", image: "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1200&q=70", rating: 4.9, price: 15000, bestTime: "April–October" },
+  { id: "skardu", name: "Skardu & Gilgit", image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=70", rating: 4.8, price: 18000, bestTime: "May–September" },
+  { id: "islamabad", name: "Islamabad Beauty", image: "https://images.unsplash.com/photo-1598027267707-47d936a1dd8a?auto=format&fit=crop&w=1200&q=70", rating: 4.8, price: 8000, bestTime: "All Year" },
+  { id: "khunjerab", name: "Khunjerab (Pak-China Border)", image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=70", rating: 5.0, price: 22000, bestTime: "May–October" },
 ];
 
 export const testimonials = [
