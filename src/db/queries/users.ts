@@ -54,3 +54,37 @@ export async function syncCurrentUser(defaultRole: UserRole = "tourist") {
     with: { roles: true },
   });
 }
+export async function promoteUserToAdmin(targetUserId: string) {
+  // 1️⃣ Ensure the caller is an admin
+  const { userId: callerId } = await auth();
+  if (!callerId) throw new Error('Unauthenticated');
+
+  // Verify caller's role is admin
+  const caller = await db.query.users.findFirst({
+    where: eq(users.id, callerId),
+    with: { roles: true },
+  });
+  if (!caller) throw new Error('Caller not found');
+  const callerIsAdmin = caller.roles.some((r) => r.role === 'admin' && r.status === 'active');
+  if (!callerIsAdmin) throw new Error('Forbidden: only admins can promote');
+
+  // 2️⃣ Update the target user's active_role field
+  await db
+    .update(users)
+    .set({ activeRole: 'admin' })
+    .where(eq(users.id, targetUserId));
+
+  // 3️⃣ Insert the admin role assignment with status "active"
+  await db.insert(userRoles).values({
+    id: createId('urole'),
+    userId: targetUserId,
+    role: 'admin',
+    status: 'active',
+  });
+
+  // Return the updated user (including new role)
+  return db.query.users.findFirst({
+    where: eq(users.id, targetUserId),
+    with: { roles: true },
+  });
+}
