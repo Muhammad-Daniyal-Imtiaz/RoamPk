@@ -6,20 +6,28 @@ import { motion } from "framer-motion";
 
 const images = [
   {
-    src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2200&q=85",
-    alt: "Nanga Parbat",
+    src: "https://images.unsplash.com/photo-1627839352924-f7c8f00030a5?auto=format&fit=crop&w=2200&q=85",
+    alt: "Faisal Mosque, Islamabad",
   },
   {
-    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=85",
-    alt: "Fairy Meadows",
+    src: "https://images.unsplash.com/photo-1602717724357-a37a7cd9a4af?auto=format&fit=crop&w=2200&q=85",
+    alt: "Badshahi Mosque, Lahore",
   },
   {
     src: "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=2200&q=85",
-    alt: "Hunza Valley",
+    alt: "Hunza Valley (Passu Cones)",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1598027267707-47d936a1dd8a?auto=format&fit=crop&w=2200&q=85",
+    alt: "Islamabad Margalla Hills",
   },
   {
     src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=85",
-    alt: "Karakoram",
+    alt: "Gilgit-Baltistan (Skardu)",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=2200&q=85",
+    alt: "Pak-China Border (Khunjerab Pass)",
   }
 ];
 
