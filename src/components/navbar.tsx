@@ -11,8 +11,8 @@ const links = [
   ["SIM", "/sim"],
   ["Currency", "/currency"],
   ["Tours", "/tours"],
-  ["Routes", "/routes"],
-  ["Destinations", "/destinations"],
+  ["Emergency", "/emergency"],
+  ["Language", "/language"],
 ];
 
 export function Navbar() {
