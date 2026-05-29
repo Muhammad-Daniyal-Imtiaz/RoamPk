@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "build:cloudflare": "npx opennextjs-cloudflare build && node move-assets.js && node move-worker.js",
+    "start": "next start",
+    "start:cloudflare": "npx opennextjs-cloudflare",
+    "cf:deploy": "npx opennextjs-cloudflare deploy",
+    "cf:preview": "npx opennextjs-cloudflare preview"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -18,11 +22,13 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.19.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.85.0"
   }
 }

@@ -1,0 +1,8 @@
+name = "roampk"
+compatibility_date = "2026-04-27"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".open-next"
+
+[vars]
+# Add your production environment variables here if needed
+# Redeployed: 2026-04-27
