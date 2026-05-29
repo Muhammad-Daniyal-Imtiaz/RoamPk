@@ -6,20 +6,20 @@ import { motion } from "framer-motion";
 
 const images = [
   {
-    src: "https://images.unsplash.com/photo-1598027267707-47d936a1dd8a?auto=format&fit=crop&w=1200&q=70",
-    alt: "Faisal Mosque, Islamabad",
+    src: "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1200&q=70",
+    alt: "Hunza Valley (Passu Cones)",
   },
   {
     src: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=70",
     alt: "Badshahi Mosque, Lahore",
   },
   {
-    src: "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1200&q=70",
-    alt: "Hunza Valley (Passu Cones)",
+    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=70",
+    alt: "Fairy Meadows",
   },
   {
     src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=70",
-    alt: "Fairy Meadows & Nanga Parbat",
+    alt: "Nanga Parbat",
   },
   {
     src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=70",
@@ -46,7 +46,7 @@ export function HeroCarousel() {
       {images.map((img, index) => (
         <motion.div
           key={img.src}
-          initial={{ opacity: 0 }}
+          initial={{ opacity: index === 0 ? 1 : 0, scale: index === 0 ? 1 : 1.1 }}
           animate={{
             opacity: index === currentIndex ? 1 : 0,
             scale: index === currentIndex ? 1 : 1.1,
