@@ -1,18 +1,16 @@
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users, localTouristProfiles, internationalTouristProfiles } from "@/db/schema";
 import { Section } from "@/components/section";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getRoleDefinition } from "@/lib/roles";
 import { ProfileForm } from "@/components/profile-form";
+import { RoleSwitcher } from "@/components/role-switcher";
 import {
   CalendarDays,
   MapPin,
-  Shield,
   BadgeCheck,
   Globe,
   Flag,
@@ -102,6 +100,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
+            {/* Role stats */}
             <Card>
               <CardContent>
                 <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#006600]">Stats</h3>
@@ -119,45 +118,38 @@ export default async function DashboardPage() {
                     <p className="text-xs text-gray-400">Pending</p>
                   </div>
                 </div>
-                <div className="mt-5 space-y-2">
-                  <Link href="/onboarding">
-                    <Button variant="outline" className="w-full">Add / Change Role</Button>
-                  </Link>
-                </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent>
-                <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#006600]">Your Roles</h3>
-                <div className="mt-4 space-y-2">
-                  {dbUser.roles.map((role) => {
-                    const def = getRoleDefinition(role.role);
-                    const Icon = def?.icon || Shield;
-                    return (
-                      <div key={role.id} className="flex items-center gap-3 rounded-2xl bg-[#1a201a] p-3">
-                        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#006600]/10 text-[#006600]">
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <span className="flex-1 text-sm font-bold text-white">{def?.label || role.role}</span>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase ${
-                          role.status === "active" ? "bg-green-500/10 text-green-400" :
-                          role.status === "pending" ? "bg-yellow-500/10 text-yellow-400" :
-                          role.status === "rejected" ? "bg-red-500/10 text-red-400" :
-                          "bg-gray-500/10 text-gray-400"
-                        }`}>
-                          {role.status}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Role switcher — lets user pick which role is active */}
+            <RoleSwitcher
+              roles={dbUser.roles as { id: string; role: import("@/lib/roles").UserRole; status: "pending" | "active" | "suspended" | "rejected" }[]}
+              activeRole={dbUser.activeRole}
+            />
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* Active role context banner */}
+            {activeRole && (
+              <Card>
+                <CardContent>
+                  <div className="flex items-start gap-4">
+                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#006600]/15 text-[#006600]">
+                      <activeRole.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#006600]">
+                        You are browsing as
+                      </p>
+                      <p className="mt-0.5 text-lg font-black text-white">{activeRole.label}</p>
+                      <p className="mt-1 text-sm text-gray-400">{activeRole.description}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <ProfileForm user={dbUser} />
 
             {/* Local Tourist Profile */}

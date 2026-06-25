@@ -4,10 +4,11 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { partnerProfiles, users, localTouristProfiles, internationalTouristProfiles } from "@/db/schema";
 import { ProfileForm } from "@/components/profile-form";
+import { RoleSwitcher } from "@/components/role-switcher";
 import { Section } from "@/components/section";
 import { Card, CardContent } from "@/components/ui/card";
 import { getRoleDefinition } from "@/lib/roles";
-import { Calendar, Clock, Flag, Globe, MapPin, Users, Bed, Plane, Home, Shield, BadgeCheck } from "lucide-react";
+import { Calendar, Clock, Flag, Globe, MapPin, Users, Bed, Plane, Home, BadgeCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -289,6 +290,11 @@ export default async function ProfilePage() {
           </div>
 
           <div className="space-y-6">
+            {/* Role switcher */}
+            <RoleSwitcher
+              roles={user.roles as { id: string; role: import("@/lib/roles").UserRole; status: "pending" | "active" | "suspended" | "rejected" }[]}
+              activeRole={user.activeRole}
+            />
             <ProfileForm user={user} />
           </div>
         </div>
