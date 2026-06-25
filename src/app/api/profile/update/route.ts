@@ -13,12 +13,12 @@ export async function PUT(req: Request) {
   try {
     const { name, image, bio, city, province } = await req.json();
 
-    const updateData: Record<string, string> = {};
-    if (name) updateData.name = name;
-    if (image) updateData.image = image;
-    if (bio) updateData.bio = bio;
-    if (city) updateData.city = city;
-    if (province) updateData.province = province;
+    const updateData: Record<string, string | null> = {};
+    if (name !== undefined) updateData.name = name;
+    if (image !== undefined) updateData.image = image || null;
+    if (bio !== undefined) updateData.bio = bio || null;
+    if (city !== undefined) updateData.city = city || null;
+    if (province !== undefined) updateData.province = province || null;
 
     if (Object.keys(updateData).length > 0) {
       updateData.updatedAt = new Date().toISOString();

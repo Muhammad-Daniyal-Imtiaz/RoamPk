@@ -47,3 +47,10 @@ next-env.d.ts
 # local database
 *.db
 *.db-journal
+
+# opennext / cloudflare build output
+.open-next/
+
+# drizzle kit
+drizzle/meta/
+*.sqlite

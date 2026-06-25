@@ -29,30 +29,31 @@ export default async function ProfilePage() {
     <main className="pt-28">
       <Section title="Your Profile" subtitle="Manage your RoamPK profile and business information">
         <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
-          <Card>
-            <CardContent className="text-center">
-              {user.image ? (
-                <img src={user.image} alt="" className="mx-auto h-24 w-24 rounded-full object-cover" />
-              ) : (
-                <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-[#006600]/10 text-3xl font-black text-[#006600]">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <h2 className="mt-4 text-2xl font-black text-white">{user.name}</h2>
-              <p className="text-sm text-gray-400">{user.email}</p>
-              {activeRoleDef && (
-                <span className="mt-2 inline-block rounded-full bg-[#006600]/10 px-3 py-1 text-xs font-black uppercase text-[#006600]">
-                  {activeRoleDef.label}
-                </span>
-              )}
-              <div className="mt-4 space-y-2 text-sm text-gray-400">
-                <p>Member since {new Date(user.createdAt).toLocaleDateString()}</p>
-                <p>{user.roles.length} role{user.roles.length !== 1 ? "s" : ""} assigned</p>
-              </div>
-            </CardContent>
-          </Card>
-
           <div className="space-y-6">
+            <Card>
+              <CardContent className="text-center">
+                {user.image ? (
+                  <img src={user.image} alt="" className="mx-auto h-24 w-24 rounded-full object-cover ring-2 ring-[#006600]/30" />
+                ) : (
+                  <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-[#006600]/10 text-4xl font-black text-[#006600] ring-2 ring-[#006600]/30">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <h2 className="mt-4 text-2xl font-black text-white">{user.name}</h2>
+                <p className="text-sm text-gray-400">{user.email}</p>
+                {activeRoleDef && (
+                  <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#006600]/10 px-4 py-1.5 text-xs font-black uppercase text-[#006600]">
+                    {activeRoleDef.label}
+                  </span>
+                )}
+                <div className="mt-4 space-y-2 text-sm text-gray-400">
+                  <p>Member since {new Date(user.createdAt).toLocaleDateString()}</p>
+                  <p>{user.roles.length} role{user.roles.length !== 1 ? "s" : ""} assigned</p>
+                  {user.bio && <p className="mt-3 text-gray-300">{user.bio}</p>}
+                </div>
+              </CardContent>
+            </Card>
+
             {profiles.length > 0 ? (
               profiles.map((profile) => {
                 const def = getRoleDefinition(profile.role);
@@ -89,7 +90,7 @@ export default async function ProfilePage() {
                       {profile.proofImageUrl && (
                         <div className="mt-4">
                           <p className="mb-2 text-sm text-gray-500">Verification Document ({profile.proofType || "other"}):</p>
-                          <img src={profile.proofImageUrl} alt="Proof" className="h-24 w-auto rounded-xl object-cover border border-white/10" />
+                          <img src={profile.proofImageUrl} alt="Proof" className="h-24 w-auto rounded-xl border border-white/10 object-cover" />
                         </div>
                       )}
                     </CardContent>
@@ -103,7 +104,9 @@ export default async function ProfilePage() {
                 </CardContent>
               </Card>
             )}
+          </div>
 
+          <div className="space-y-6">
             <ProfileForm user={user} />
           </div>
         </div>
