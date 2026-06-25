@@ -52,7 +52,7 @@ export const roleDefinitions: RoleDefinition[] = [
     dashboardPath: "/dashboard/tourist",
     icon: Map,
     permissions: ["booking:create", "follow:create", "review:create", "trip:manage"],
-    onboardingFields: ["bio", "city", "interests"],
+    onboardingFields: ["country", "city", "interests", "visitPurpose", "arrivalDate", "duration", "travelGroup", "accommodation"],
     isBusiness: false,
   },
   {
@@ -228,6 +228,7 @@ export const followTargetTypes = [
   "destination",
   "route",
   "tour_package",
+  "tourist_profile",
 ] as const;
 
 export const getRoleDefinition = (role: UserRole) =>
@@ -255,4 +256,31 @@ export const pakistanCities = [
   "Mardan", "Abbottabad", "Bahawalpur", "Sargodha", "Sheikhupura",
   "Mirpur", "Muzaffarabad", "Gwadar", "Chitral", "Fairy Meadows",
   "Deosai", "Kashmir", "Larkana", "Thatta", "Nawabshah",
+] as const;
+
+export const countries = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
+  "Bahrain", "Bangladesh", "Belarus", "Belgium", "Bhutan", "Bosnia and Herzegovina", "Brazil", "Brunei", "Bulgaria",
+  "Cambodia", "Canada", "Chile", "China", "Colombia", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
+  "Denmark", "Djibouti",
+  "Egypt", "Estonia", "Ethiopia",
+  "Fiji", "Finland", "France",
+  "Georgia", "Germany", "Ghana", "Greece",
+  "Hong Kong", "Hungary",
+  "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
+  "Jamaica", "Japan", "Jordan",
+  "Kazakhstan", "Kenya", "Kuwait", "Kyrgyzstan",
+  "Laos", "Latvia", "Lebanon", "Lithuania", "Luxembourg",
+  "Malaysia", "Maldives", "Mauritius", "Mexico", "Mongolia", "Morocco", "Myanmar",
+  "Nepal", "Netherlands", "New Zealand", "Nigeria", "North Korea", "Norway",
+  "Oman",
+  "Pakistan", "Palestine", "Philippines", "Poland", "Portugal",
+  "Qatar",
+  "Romania", "Russia", "Rwanda",
+  "Saudi Arabia", "Serbia", "Singapore", "Slovakia", "Slovenia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria",
+  "Tajikistan", "Tanzania", "Thailand", "Tunisia", "Turkey", "Turkmenistan",
+  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uzbekistan",
+  "Vietnam",
+  "Yemen",
+  "Zambia", "Zimbabwe",
 ] as const;

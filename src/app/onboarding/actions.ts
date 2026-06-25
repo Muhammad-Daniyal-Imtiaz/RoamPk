@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { partnerProfiles, userRoles, users } from "@/db/schema";
+import { partnerProfiles, touristProfiles, userRoles, users } from "@/db/schema";
 import { syncCurrentUser } from "@/db/queries/users";
 import { getRoleDefinition, type UserRole } from "@/lib/roles";
 import { createId } from "@/lib/id";
@@ -23,20 +23,6 @@ export async function completeOnboarding(formData: FormData) {
 
   const dbUser = await syncCurrentUser(role);
   if (!dbUser) redirect("/sign-in");
-
-  const updateData: Record<string, unknown> = {};
-
-  const bio = formData.get("bio");
-  if (bio) updateData.bio = bio;
-
-  const city = formData.get("city");
-  if (city) updateData.city = city;
-
-  const province = formData.get("province");
-  if (province) updateData.province = province;
-
-  const about = formData.get("about");
-  if (about) updateData.about = about;
 
   await db
     .insert(userRoles)
@@ -63,56 +49,94 @@ export async function completeOnboarding(formData: FormData) {
     })
     .where(eq(users.id, dbUser.id));
 
-  const isBusiness = roleDefinition.isBusiness;
+  if (role === "tourist") {
+    const country = String(formData.get("country") ?? "Pakistan");
+    const isInternational = country !== "Pakistan";
+    const comingToPakistan = formData.get("comingToPakistan") === "yes";
+    const citiesRaw = String(formData.get("citiesToVisit") ?? "[]");
+    let cities: string[];
+    try { cities = JSON.parse(citiesRaw); } catch { cities = []; }
 
-  if (isBusiness) {
-    const businessName = String(formData.get("businessName") ?? "");
-    const designation = formData.get("designation") as string | null;
-    const designationOther = formData.get("designationOther") as string | null;
-    const contactPhone = String(formData.get("contactPhone") ?? "");
-    const address = String(formData.get("address") ?? "");
-    const area = String(formData.get("area") ?? "");
-    const website = String(formData.get("website") ?? "");
-    const proofImageUrl = String(formData.get("proofImageUrl") ?? "");
-    const proofType = formData.get("proofType") as string | null;
+    await db
+      .insert(touristProfiles)
+      .values({
+        id: createId("tprof"),
+        userId: dbUser.id,
+        country,
+        city: String(formData.get("city") ?? ""),
+        province: String(formData.get("province") ?? ""),
+        isInternational,
+        comingToPakistan,
+        visitPurpose: String(formData.get("visitPurpose") ?? ""),
+        arrivalDate: String(formData.get("arrivalDate") ?? ""),
+        durationDays: Number(formData.get("durationDays")) || null,
+        citiesToVisitJson: cities,
+        travelGroup: String(formData.get("travelGroup") ?? ""),
+        groupSize: Number(formData.get("groupSize")) || null,
+        accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
+        accommodationBudget: Number(formData.get("accommodationBudget")) || null,
+        bio: String(formData.get("bio") ?? ""),
+      })
+      .onConflictDoUpdate({
+        target: [touristProfiles.userId],
+        set: {
+          country,
+          city: String(formData.get("city") ?? ""),
+          province: String(formData.get("province") ?? ""),
+          isInternational,
+          comingToPakistan,
+          visitPurpose: String(formData.get("visitPurpose") ?? ""),
+          arrivalDate: String(formData.get("arrivalDate") ?? ""),
+          durationDays: Number(formData.get("durationDays")) || null,
+          citiesToVisitJson: cities,
+          travelGroup: String(formData.get("travelGroup") ?? ""),
+          groupSize: Number(formData.get("groupSize")) || null,
+          accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
+          accommodationBudget: Number(formData.get("accommodationBudget")) || null,
+          bio: String(formData.get("bio") ?? ""),
+          updatedAt: new Date().toISOString(),
+        },
+      });
+  }
 
+  if (roleDefinition.isBusiness) {
     await db
       .insert(partnerProfiles)
       .values({
         id: createId("partner"),
         userId: dbUser.id,
         role,
-        businessName: businessName || `${dbUser.name} ${roleDefinition.label}`,
-        designation: (designation && designation !== "other" ? designation : null) as typeof partnerProfiles.designation,
-        designationOther: designation === "other" ? designationOther : null,
-        contactPhone,
+        businessName: String(formData.get("businessName") ?? "") || `${dbUser.name} ${roleDefinition.label}`,
+        designation: (formData.get("designation") as typeof partnerProfiles.designation) || null,
+        designationOther: formData.get("designation") === "other" ? String(formData.get("designationOther") ?? "") : null,
+        contactPhone: String(formData.get("contactPhone") ?? ""),
         city: String(formData.get("city") ?? ""),
-        address,
+        address: String(formData.get("address") ?? ""),
         province: String(formData.get("province") ?? ""),
-        area,
+        area: String(formData.get("area") ?? ""),
         about: String(formData.get("about") ?? ""),
         isBusiness: true,
-        website,
-        proofImageUrl: proofImageUrl || null,
-        proofType: (proofType as typeof partnerProfiles.proofType) || null,
+        website: String(formData.get("website") ?? ""),
+        proofImageUrl: String(formData.get("proofImageUrl") ?? "") || null,
+        proofType: (formData.get("proofType") as typeof partnerProfiles.proofType) || null,
         verificationStatus: "pending",
         metadataJson: Object.fromEntries(formData.entries()),
       })
       .onConflictDoUpdate({
         target: [partnerProfiles.userId, partnerProfiles.role],
         set: {
-          businessName: businessName || `${dbUser.name} ${roleDefinition.label}`,
-          designation: (designation && designation !== "other" ? designation : null) as typeof partnerProfiles.designation,
-          designationOther: designation === "other" ? designationOther : null,
-          contactPhone,
+          businessName: String(formData.get("businessName") ?? "") || `${dbUser.name} ${roleDefinition.label}`,
+          designation: (formData.get("designation") as typeof partnerProfiles.designation) || null,
+          designationOther: formData.get("designation") === "other" ? String(formData.get("designationOther") ?? "") : null,
+          contactPhone: String(formData.get("contactPhone") ?? ""),
           city: String(formData.get("city") ?? ""),
-          address,
+          address: String(formData.get("address") ?? ""),
           province: String(formData.get("province") ?? ""),
-          area,
+          area: String(formData.get("area") ?? ""),
           about: String(formData.get("about") ?? ""),
-          website,
-          proofImageUrl: proofImageUrl || null,
-          proofType: (proofType as typeof partnerProfiles.proofType) || null,
+          website: String(formData.get("website") ?? ""),
+          proofImageUrl: String(formData.get("proofImageUrl") ?? "") || null,
+          proofType: (formData.get("proofType") as typeof partnerProfiles.proofType) || null,
           verificationStatus: "pending",
           metadataJson: Object.fromEntries(formData.entries()),
           updatedAt: new Date().toISOString(),

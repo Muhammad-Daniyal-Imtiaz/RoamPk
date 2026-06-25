@@ -51,6 +51,7 @@ export const followTargetEnum = [
   "destination",
   "route",
   "tour_package",
+  "tourist_profile",
 ] as const;
 
 const timestamps = {
@@ -304,10 +305,39 @@ export const emergencyTeams = sqliteTable("emergency_teams", {
   ...timestamps,
 });
 
+export const touristProfiles = sqliteTable("tourist_profiles", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  country: text("country").notNull().default("Pakistan"),
+  city: text("city"),
+  province: text("province"),
+  isInternational: integer("is_international", { mode: "boolean" }).notNull().default(false),
+  comingToPakistan: integer("coming_to_pakistan", { mode: "boolean" }).notNull().default(true),
+  visitPurpose: text("visit_purpose"),
+  arrivalDate: text("arrival_date"),
+  durationDays: integer("duration_days"),
+  citiesToVisitJson: text("cities_to_visit_json", { mode: "json" }).$type<string[]>().notNull().default([]),
+  travelGroup: text("travel_group"),
+  groupSize: integer("group_size"),
+  accommodationPreference: text("accommodation_preference"),
+  accommodationBudget: integer("accommodation_budget"),
+  interestsJson: text("interests_json", { mode: "json" }).$type<string[]>().notNull().default([]),
+  bio: text("bio"),
+  ...timestamps,
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   roles: many(userRoles),
   partnerProfiles: many(partnerProfiles),
   follows: many(follows),
+  touristProfiles: many(touristProfiles),
+}));
+
+export const touristProfilesRelations = relations(touristProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [touristProfiles.userId],
+    references: [users.id],
+  }),
 }));
 
 export const userRolesRelations = relations(userRoles, ({ one }) => ({
