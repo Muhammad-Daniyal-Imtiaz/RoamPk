@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  serverExternalPackages: ["@libsql/client", "@libsql/isomorphic-ws"],
   // Static assets are handled by Cloudflare Pages
 };
 

@@ -69,6 +69,10 @@ export default function OnboardingPage() {
   const [comingToPakistan, setComingToPakistan] = useState(true);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
 
+  // Captured step-3 form values — stored when user clicks "Next" so they
+  // survive the conditional unmount of step-3 JSX.
+  const [capturedFields, setCapturedFields] = useState<Record<string, string>>({});
+
   const filteredRoles = roleDefinitions.filter(
     (r) => r.id !== "admin" && (profileType === "business" ? r.isBusiness : !r.isBusiness),
   );
@@ -108,6 +112,8 @@ export default function OnboardingPage() {
 
     const formData = new FormData(formRef.current!);
     formData.set("role", selectedRole!);
+    // citiesToVisit is already in capturedFields as a hidden input,
+    // but override with latest selectedCities just in case.
     formData.set("citiesToVisit", JSON.stringify(selectedCities));
 
     try {
@@ -604,12 +610,39 @@ export default function OnboardingPage() {
                     <Button type="button" variant="ghost" onClick={() => { isTourist ? (setTouristType(null), setStep(2)) : setStep(1); }}>
                       <ArrowLeft className="mr-2 h-4 w-4" /> Back
                     </Button>
-                    <Button type="button" onClick={() => setStep(4)} className="ml-auto">
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        // Capture all current step-3 form values before the
+                        // step changes and the inputs are unmounted from DOM.
+                        if (formRef.current) {
+                          const fd = new FormData(formRef.current);
+                          const snapshot: Record<string, string> = {};
+                          fd.forEach((value, key) => {
+                            snapshot[key] = String(value);
+                          });
+                          // Also persist cities & touristType from React state
+                          snapshot["citiesToVisit"] = JSON.stringify(selectedCities);
+                          if (touristType) snapshot["touristType"] = touristType;
+                          if (country) snapshot["country"] = country;
+                          snapshot["comingToPakistan"] = comingToPakistan ? "yes" : "no";
+                          setCapturedFields(snapshot);
+                        }
+                        setStep(4);
+                      }}
+                      className="ml-auto"
+                    >
                       Next <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
               )}
+
+              {/* Hidden inputs that persist captured step-3 values across step changes.
+                  These are always rendered so FormData always contains them at submission. */}
+              {Object.entries(capturedFields).map(([key, value]) => (
+                <input key={key} type="hidden" name={key} value={value} />
+              ))}
 
               {/* STEP 4: Verification / Review */}
               {step === 4 && selectedRole && roleDef && (

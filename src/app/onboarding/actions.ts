@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { partnerProfiles, touristProfiles, userRoles, users } from "@/db/schema";
+import { partnerProfiles, localTouristProfiles, internationalTouristProfiles, userRoles, users } from "@/db/schema";
 import { syncCurrentUser } from "@/db/queries/users";
 import { getRoleDefinition, type UserRole } from "@/lib/roles";
 import { createId } from "@/lib/id";
@@ -50,41 +50,19 @@ export async function completeOnboarding(formData: FormData) {
     .where(eq(users.id, dbUser.id));
 
   if (role === "tourist") {
-    const country = String(formData.get("country") ?? "Pakistan");
-    const isInternational = country !== "Pakistan";
-    const comingToPakistan = formData.get("comingToPakistan") === "yes";
+    const touristType = String(formData.get("touristType") ?? "local");
     const citiesRaw = String(formData.get("citiesToVisit") ?? "[]");
     let cities: string[];
     try { cities = JSON.parse(citiesRaw); } catch { cities = []; }
 
-    await db
-      .insert(touristProfiles)
-      .values({
-        id: createId("tprof"),
-        userId: dbUser.id,
-        country,
-        city: String(formData.get("city") ?? ""),
-        province: String(formData.get("province") ?? ""),
-        isInternational,
-        comingToPakistan,
-        visitPurpose: String(formData.get("visitPurpose") ?? ""),
-        arrivalDate: String(formData.get("arrivalDate") ?? ""),
-        durationDays: Number(formData.get("durationDays")) || null,
-        citiesToVisitJson: cities,
-        travelGroup: String(formData.get("travelGroup") ?? ""),
-        groupSize: Number(formData.get("groupSize")) || null,
-        accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
-        accommodationBudget: Number(formData.get("accommodationBudget")) || null,
-        bio: String(formData.get("bio") ?? ""),
-      })
-      .onConflictDoUpdate({
-        target: [touristProfiles.userId],
-        set: {
-          country,
+    if (touristType === "local") {
+      await db
+        .insert(localTouristProfiles)
+        .values({
+          id: createId("ltprof"),
+          userId: dbUser.id,
           city: String(formData.get("city") ?? ""),
           province: String(formData.get("province") ?? ""),
-          isInternational,
-          comingToPakistan,
           visitPurpose: String(formData.get("visitPurpose") ?? ""),
           arrivalDate: String(formData.get("arrivalDate") ?? ""),
           durationDays: Number(formData.get("durationDays")) || null,
@@ -94,9 +72,62 @@ export async function completeOnboarding(formData: FormData) {
           accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
           accommodationBudget: Number(formData.get("accommodationBudget")) || null,
           bio: String(formData.get("bio") ?? ""),
-          updatedAt: new Date().toISOString(),
-        },
-      });
+        })
+        .onConflictDoUpdate({
+          target: [localTouristProfiles.userId],
+          set: {
+            city: String(formData.get("city") ?? ""),
+            province: String(formData.get("province") ?? ""),
+            visitPurpose: String(formData.get("visitPurpose") ?? ""),
+            arrivalDate: String(formData.get("arrivalDate") ?? ""),
+            durationDays: Number(formData.get("durationDays")) || null,
+            citiesToVisitJson: cities,
+            travelGroup: String(formData.get("travelGroup") ?? ""),
+            groupSize: Number(formData.get("groupSize")) || null,
+            accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
+            accommodationBudget: Number(formData.get("accommodationBudget")) || null,
+            bio: String(formData.get("bio") ?? ""),
+            updatedAt: new Date().toISOString(),
+          },
+        });
+    } else {
+      await db
+        .insert(internationalTouristProfiles)
+        .values({
+          id: createId("itprof"),
+          userId: dbUser.id,
+          country: String(formData.get("country") ?? ""),
+          comingToPakistan: formData.get("comingToPakistan") === "yes",
+          visitPurpose: String(formData.get("visitPurpose") ?? ""),
+          arrivalDate: String(formData.get("arrivalDate") ?? ""),
+          durationDays: Number(formData.get("durationDays")) || null,
+          citiesToVisitJson: cities,
+          travelGroup: String(formData.get("travelGroup") ?? ""),
+          groupSize: Number(formData.get("groupSize")) || null,
+          accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
+          accommodationBudget: Number(formData.get("accommodationBudget")) || null,
+          homeCity: String(formData.get("city") ?? ""),
+          bio: String(formData.get("bio") ?? ""),
+        })
+        .onConflictDoUpdate({
+          target: [internationalTouristProfiles.userId],
+          set: {
+            country: String(formData.get("country") ?? ""),
+            comingToPakistan: formData.get("comingToPakistan") === "yes",
+            visitPurpose: String(formData.get("visitPurpose") ?? ""),
+            arrivalDate: String(formData.get("arrivalDate") ?? ""),
+            durationDays: Number(formData.get("durationDays")) || null,
+            citiesToVisitJson: cities,
+            travelGroup: String(formData.get("travelGroup") ?? ""),
+            groupSize: Number(formData.get("groupSize")) || null,
+            accommodationPreference: String(formData.get("accommodationPreference") ?? ""),
+            accommodationBudget: Number(formData.get("accommodationBudget")) || null,
+            homeCity: String(formData.get("city") ?? ""),
+            bio: String(formData.get("bio") ?? ""),
+            updatedAt: new Date().toISOString(),
+          },
+        });
+    }
   }
 
   if (roleDefinition.isBusiness) {

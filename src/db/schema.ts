@@ -308,37 +308,65 @@ export const emergencyTeams = sqliteTable("emergency_teams", {
   ...timestamps,
 });
 
-export const touristProfiles = sqliteTable("tourist_profiles", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  country: text("country").notNull().default("Pakistan"),
-  city: text("city"),
-  province: text("province"),
-  isInternational: integer("is_international", { mode: "boolean" }).notNull().default(false),
-  comingToPakistan: integer("coming_to_pakistan", { mode: "boolean" }).notNull().default(true),
-  visitPurpose: text("visit_purpose"),
-  arrivalDate: text("arrival_date"),
-  durationDays: integer("duration_days"),
-  citiesToVisitJson: text("cities_to_visit_json", { mode: "json" }).$type<string[]>().notNull().default([]),
-  travelGroup: text("travel_group"),
-  groupSize: integer("group_size"),
-  accommodationPreference: text("accommodation_preference"),
-  accommodationBudget: integer("accommodation_budget"),
-  interestsJson: text("interests_json", { mode: "json" }).$type<string[]>().notNull().default([]),
-  bio: text("bio"),
-  ...timestamps,
-});
+export const localTouristProfiles = sqliteTable(
+  "local_tourist_profiles",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+    city: text("city"),
+    province: text("province"),
+    visitPurpose: text("visit_purpose"),
+    arrivalDate: text("arrival_date"),
+    durationDays: integer("duration_days"),
+    citiesToVisitJson: text("cities_to_visit_json", { mode: "json" }).$type<string[]>().notNull().default([]),
+    travelGroup: text("travel_group"),
+    groupSize: integer("group_size"),
+    accommodationPreference: text("accommodation_preference"),
+    accommodationBudget: integer("accommodation_budget"),
+    bio: text("bio"),
+    ...timestamps,
+  },
+);
+
+export const internationalTouristProfiles = sqliteTable(
+  "international_tourist_profiles",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+    country: text("country").notNull().default(""),
+    comingToPakistan: integer("coming_to_pakistan", { mode: "boolean" }).notNull().default(true),
+    visitPurpose: text("visit_purpose"),
+    arrivalDate: text("arrival_date"),
+    durationDays: integer("duration_days"),
+    citiesToVisitJson: text("cities_to_visit_json", { mode: "json" }).$type<string[]>().notNull().default([]),
+    travelGroup: text("travel_group"),
+    groupSize: integer("group_size"),
+    accommodationPreference: text("accommodation_preference"),
+    accommodationBudget: integer("accommodation_budget"),
+    homeCity: text("home_city"),
+    bio: text("bio"),
+    ...timestamps,
+  },
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   roles: many(userRoles),
   partnerProfiles: many(partnerProfiles),
   follows: many(follows),
-  touristProfiles: many(touristProfiles),
+  localTouristProfiles: many(localTouristProfiles),
+  internationalTouristProfiles: many(internationalTouristProfiles),
 }));
 
-export const touristProfilesRelations = relations(touristProfiles, ({ one }) => ({
+export const localTouristProfilesRelations = relations(localTouristProfiles, ({ one }) => ({
   user: one(users, {
-    fields: [touristProfiles.userId],
+    fields: [localTouristProfiles.userId],
+    references: [users.id],
+  }),
+}));
+
+export const internationalTouristProfilesRelations = relations(internationalTouristProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [internationalTouristProfiles.userId],
     references: [users.id],
   }),
 }));
