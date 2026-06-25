@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { syncCurrentUser } from "@/db/queries/users";
 import { Section } from "@/components/section";
@@ -10,8 +10,8 @@ import { getRoleDefinition } from "@/lib/roles";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const session = await auth();
+  if (!session?.user?.id) redirect("/sign-in");
 
   const dbUser = await syncCurrentUser();
   if (!dbUser) redirect("/sign-in");
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="pt-28">
-      <Section title={`Welcome, ${dbUser.displayName}`} subtitle="Your Clerk identity is synced into Turso through Drizzle.">
+      <Section title={`Welcome, ${dbUser.name}`} subtitle="Your identity is synced into Turso through Drizzle.">
         <div className="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
           <Card>
             <CardContent>
@@ -29,6 +29,9 @@ export default async function DashboardPage() {
               <p className="mt-3 text-gray-500">{activeRole?.description}</p>
               <Link href="/onboarding">
                 <Button className="mt-6" variant="outline">Change / Add Role</Button>
+              </Link>
+              <Link href="/profile">
+                <Button className="mt-3" variant="outline">View Profile</Button>
               </Link>
             </CardContent>
           </Card>

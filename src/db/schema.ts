@@ -1,5 +1,5 @@
-import { relations, sql } from "drizzle-orm";
-import { index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { index, integer, primaryKey, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import type { UserRole } from "@/lib/roles";
 
 export const roleEnum = [
@@ -9,6 +9,7 @@ export const roleEnum = [
   "hotel_partner",
   "hostel_partner",
   "cafe_partner",
+  "restaurant_partner",
   "sim_partner",
   "tour_guide",
   "food_expert",
@@ -17,12 +18,33 @@ export const roleEnum = [
 
 export const roleStatusEnum = ["pending", "active", "suspended", "rejected"] as const;
 export const verificationStatusEnum = ["draft", "pending", "verified", "rejected"] as const;
+export const designationEnum = [
+  "owner",
+  "manager",
+  "ceo",
+  "general_manager",
+  "operations_manager",
+  "executive_chef",
+  "head_chef",
+  "front_desk_manager",
+  "marketing_manager",
+  "regional_manager",
+  "team_lead",
+  "coordinator",
+  "director",
+  "officer",
+  "other",
+] as const;
+
+export const proofTypeEnum = ["cnic", "business_license", "passport", "other"] as const;
+
 export const followTargetEnum = [
   "tourist",
   "local_user",
   "hotel",
   "hostel",
   "cafe",
+  "restaurant",
   "sim_outlet",
   "tour_guide",
   "food_expert",
@@ -32,25 +54,66 @@ export const followTargetEnum = [
 ] as const;
 
 const timestamps = {
-  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: text("created_at").notNull().default("(cast(strftime('%s','now') as text))"),
+  updatedAt: text("updated_at").notNull().default("(cast(strftime('%s','now') as text))"),
 };
 
 export const users = sqliteTable(
   "users",
   {
     id: text("id").primaryKey(),
-    clerkUserId: text("clerk_user_id").notNull(),
+    name: text("name").notNull(),
     email: text("email").notNull(),
-    displayName: text("display_name").notNull(),
-    imageUrl: text("image_url"),
+    emailVerified: text("email_verified"),
+    password: text("password"),
+    image: text("image"),
     activeRole: text("active_role", { enum: roleEnum }).notNull().default("tourist"),
     onboardingComplete: integer("onboarding_complete", { mode: "boolean" }).notNull().default(false),
     ...timestamps,
   },
   (table) => ({
-    clerkUserIdIdx: uniqueIndex("users_clerk_user_id_idx").on(table.clerkUserId),
-    emailIdx: index("users_email_idx").on(table.email),
+    emailIdx: uniqueIndex("users_email_idx").on(table.email),
+  }),
+);
+
+export const accounts = sqliteTable(
+  "accounts",
+  {
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    refreshToken: text("refresh_token"),
+    accessToken: text("access_token"),
+    expiresAt: integer("expires_at"),
+    tokenType: text("token_type"),
+    scope: text("scope"),
+    idToken: text("id_token"),
+    sessionState: text("session_state"),
+  },
+  (table) => ({
+    compositePk: primaryKey({ columns: [table.provider, table.providerAccountId] }),
+  }),
+);
+
+export const sessions = sqliteTable(
+  "sessions",
+  {
+    sessionToken: text("session_token").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+  },
+);
+
+export const verificationTokens = sqliteTable(
+  "verification_tokens",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => ({
+    compositePk: primaryKey({ columns: [table.identifier, table.token] }),
   }),
 );
 
@@ -76,9 +139,18 @@ export const partnerProfiles = sqliteTable(
     userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     role: text("role", { enum: roleEnum }).notNull(),
     businessName: text("business_name").notNull(),
+    designation: text("designation", { enum: designationEnum }),
+    designationOther: text("designation_other"),
     contactPhone: text("contact_phone"),
     city: text("city"),
     address: text("address"),
+    province: text("province"),
+    area: text("area"),
+    about: text("about"),
+    isBusiness: integer("is_business", { mode: "boolean" }).notNull().default(true),
+    website: text("website"),
+    proofImageUrl: text("proof_image_url"),
+    proofType: text("proof_type", { enum: proofTypeEnum }),
     verificationStatus: text("verification_status", { enum: verificationStatusEnum }).notNull().default("draft"),
     metadataJson: text("metadata_json", { mode: "json" }).$type<Record<string, unknown>>().notNull().default({}),
     ...timestamps,
@@ -96,7 +168,7 @@ export const follows = sqliteTable(
     followerUserId: text("follower_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     targetType: text("target_type", { enum: followTargetEnum }).notNull(),
     targetId: text("target_id").notNull(),
-    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: text("created_at").notNull().default("(cast(strftime('%s','now') as text))"),
   },
   (table) => ({
     followerTargetIdx: uniqueIndex("follows_follower_target_idx").on(table.followerUserId, table.targetType, table.targetId),
@@ -155,6 +227,30 @@ export const cafes = sqliteTable(
   },
   (table) => ({
     cafesCityIdx: index("cafes_city_idx").on(table.city),
+  }),
+);
+
+export const restaurants = sqliteTable(
+  "restaurants",
+  {
+    id: text("id").primaryKey(),
+    ownerUserId: text("owner_user_id").references(() => users.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    city: text("city").notNull(),
+    address: text("address"),
+    cuisine: text("cuisine"),
+    priceRange: text("price_range"),
+    dineIn: integer("dine_in", { mode: "boolean" }).notNull().default(true),
+    takeaway: integer("takeaway", { mode: "boolean" }).notNull().default(false),
+    delivery: integer("delivery", { mode: "boolean" }).notNull().default(false),
+    wifiAvailable: integer("wifi_available", { mode: "boolean" }).notNull().default(false),
+    menuUrl: text("menu_url"),
+    rating: real("rating").notNull().default(0),
+    imagesJson: text("images_json", { mode: "json" }).$type<string[]>().notNull().default([]),
+    ...timestamps,
+  },
+  (table) => ({
+    restaurantsCityIdx: index("restaurants_city_idx").on(table.city),
   }),
 );
 
@@ -231,6 +327,20 @@ export const partnerProfilesRelations = relations(partnerProfiles, ({ one }) => 
 export const followsRelations = relations(follows, ({ one }) => ({
   user: one(users, {
     fields: [follows.followerUserId],
+    references: [users.id],
+  }),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
     references: [users.id],
   }),
 }));

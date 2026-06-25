@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, CheckCircle2, Database, KeyRound, Plus, Sparkles, Users } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { MotionDiv } from "@/components/motion";
 import { Section } from "@/components/section";
@@ -13,7 +14,6 @@ import {
   followTargetTypes,
   roleCategories,
   roleDefinitions,
-  tursoSchemaPreview,
   type RoleCategory,
   type UserRole,
 } from "@/lib/roles";
@@ -45,7 +45,7 @@ export default function JoinPage() {
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-bold backdrop-blur">
               <Sparkles className="h-4 w-4 text-[#FFD700]" />
-              Clerk + Turso ready role architecture
+              NextAuth + Turso ready role architecture
             </p>
             <h1 className="text-balance text-5xl font-black tracking-tight md:text-7xl">
               Join RoamPK as anyone in the travel ecosystem.
@@ -54,10 +54,12 @@ export default function JoinPage() {
               Tourists, local users, hotels, hostels, cafés, SIM partners, guides, food experts, emergency teams, and admins all share one extensible role model.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" onClick={() => toast("Clerk signup flow placeholder")}>
-                Continue with Clerk
-                <ArrowRight className="h-5 w-5" />
-              </Button>
+              <Link href="/sign-up">
+                <Button size="lg">
+                  Join RoamPK
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
               <Button variant="secondary" size="lg">View Role Model</Button>
             </div>
           </div>
@@ -121,7 +123,7 @@ export default function JoinPage() {
         </div>
       </Section>
 
-      <Section title="Role-Aware Onboarding Form" subtitle="UI-only today; Clerk owns identity, Turso owns roles and partner profiles later.">
+      <Section title="Role-Aware Onboarding Form" subtitle="NextAuth owns identity, Turso owns roles and partner profiles.">
         <div className="grid gap-8 lg:grid-cols-[.85fr_1.15fr]">
           <Card>
             <CardContent className="grid gap-4">
@@ -153,16 +155,26 @@ export default function JoinPage() {
                 <h3 className="text-2xl font-black">Implementation Notes</h3>
               </div>
               <div className="mt-5 grid gap-3 text-sm text-gray-600">
-                <p>Clerk stores identity, session, email verification, and auth providers.</p>
+                <p>NextAuth (Auth.js) stores identity, session, credentials, and OAuth providers.</p>
                 <p>Turso stores app truth: roles, partner verification, follows, and role-specific metadata.</p>
-                <p>Clerk public metadata can cache the active role for fast UI rendering, but Turso should remain the source of truth.</p>
+                <p>Credentials provider (email/password) + Google OAuth for authentication.</p>
               </div>
               <div className="mt-6 rounded-2xl bg-[#101510] p-5 text-sm text-emerald-100">
                 <div className="mb-3 flex items-center gap-2 font-black text-white">
                   <Database className="h-4 w-4" />
-                  Turso schema preview
+                  NextAuth + Turso stack
                 </div>
-                <pre className="whitespace-pre-wrap font-mono text-xs leading-6">{tursoSchemaPreview}</pre>
+                <pre className="whitespace-pre-wrap font-mono text-xs leading-6">{`users
+- id, name, email, password
+- active_role, onboarding_complete
+
+user_roles
+- id, user_id, role, status
+
+partner_profiles
+- id, user_id, role, business_name
+- designation, proof_image_url
+- city, province, about, verification_status`}</pre>
               </div>
             </CardContent>
           </Card>

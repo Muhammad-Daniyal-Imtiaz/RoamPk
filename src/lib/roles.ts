@@ -10,8 +10,10 @@ import {
   Smartphone,
   Utensils,
   Users,
+  ChefHat,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { designationEnum } from "@/db/schema";
 
 export type UserRole =
   | "tourist"
@@ -20,6 +22,7 @@ export type UserRole =
   | "hotel_partner"
   | "hostel_partner"
   | "cafe_partner"
+  | "restaurant_partner"
   | "sim_partner"
   | "tour_guide"
   | "food_expert"
@@ -36,6 +39,8 @@ export type RoleDefinition = {
   icon: LucideIcon;
   permissions: string[];
   onboardingFields: string[];
+  isBusiness: boolean;
+  designations?: { value: string; label: string }[];
 };
 
 export const roleDefinitions: RoleDefinition[] = [
@@ -47,7 +52,8 @@ export const roleDefinitions: RoleDefinition[] = [
     dashboardPath: "/dashboard/tourist",
     icon: Map,
     permissions: ["booking:create", "follow:create", "review:create", "trip:manage"],
-    onboardingFields: ["passportCountry", "preferredLanguage", "travelDates"],
+    onboardingFields: ["bio", "city", "interests"],
+    isBusiness: false,
   },
   {
     id: "local_user",
@@ -58,6 +64,7 @@ export const roleDefinitions: RoleDefinition[] = [
     icon: Users,
     permissions: ["follow:create", "review:create", "post:create"],
     onboardingFields: ["city", "interests"],
+    isBusiness: false,
   },
   {
     id: "hotel_partner",
@@ -67,7 +74,17 @@ export const roleDefinitions: RoleDefinition[] = [
     dashboardPath: "/dashboard/hotel-partner",
     icon: Hotel,
     permissions: ["hotel:create", "hotel:update", "booking:read"],
-    onboardingFields: ["businessName", "ntnOrLicense", "propertyAddress"],
+    onboardingFields: ["businessName", "designation", "ntnOrLicense", "propertyAddress"],
+    isBusiness: true,
+    designations: [
+      { value: "owner", label: "Owner" },
+      { value: "general_manager", label: "General Manager" },
+      { value: "operations_manager", label: "Operations Manager" },
+      { value: "front_desk_manager", label: "Front Desk Manager" },
+      { value: "marketing_manager", label: "Marketing Manager" },
+      { value: "manager", label: "Manager" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     id: "hostel_partner",
@@ -77,7 +94,14 @@ export const roleDefinitions: RoleDefinition[] = [
     dashboardPath: "/dashboard/hostel-partner",
     icon: BedDouble,
     permissions: ["hostel:create", "hostel:update", "booking:read"],
-    onboardingFields: ["businessName", "licenseNumber", "bedCapacity"],
+    onboardingFields: ["businessName", "designation", "licenseNumber", "bedCapacity"],
+    isBusiness: true,
+    designations: [
+      { value: "owner", label: "Owner" },
+      { value: "manager", label: "Manager" },
+      { value: "operations_manager", label: "Operations Manager" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     id: "cafe_partner",
@@ -87,7 +111,32 @@ export const roleDefinitions: RoleDefinition[] = [
     dashboardPath: "/dashboard/cafe-partner",
     icon: Coffee,
     permissions: ["cafe:create", "cafe:update", "offer:create"],
-    onboardingFields: ["businessName", "foodLicense", "menuUrl"],
+    onboardingFields: ["businessName", "designation", "foodLicense", "menuUrl"],
+    isBusiness: true,
+    designations: [
+      { value: "owner", label: "Owner" },
+      { value: "manager", label: "Manager" },
+      { value: "head_chef", label: "Head Chef" },
+      { value: "other", label: "Other" },
+    ],
+  },
+  {
+    id: "restaurant_partner",
+    label: "Restaurant Partner",
+    category: "partner",
+    description: "List restaurants, menus, dine-in/takeaway options, and receive reservations.",
+    dashboardPath: "/dashboard/restaurant-partner",
+    icon: ChefHat,
+    permissions: ["restaurant:create", "restaurant:update", "reservation:read"],
+    onboardingFields: ["businessName", "designation", "foodLicense", "cuisineType"],
+    isBusiness: true,
+    designations: [
+      { value: "owner", label: "Owner" },
+      { value: "executive_chef", label: "Executive Chef" },
+      { value: "manager", label: "Restaurant Manager" },
+      { value: "operations_manager", label: "Operations Manager" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     id: "sim_partner",
@@ -97,7 +146,14 @@ export const roleDefinitions: RoleDefinition[] = [
     dashboardPath: "/dashboard/sim-partner",
     icon: Smartphone,
     permissions: ["sim_package:create", "sim_order:read", "pickup_location:update"],
-    onboardingFields: ["providerName", "branchAddress", "ptaLicense"],
+    onboardingFields: ["providerName", "branchAddress", "designation", "ptaLicense"],
+    isBusiness: true,
+    designations: [
+      { value: "owner", label: "Owner" },
+      { value: "manager", label: "Store Manager" },
+      { value: "regional_manager", label: "Regional Manager" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     id: "tour_guide",
@@ -108,6 +164,7 @@ export const roleDefinitions: RoleDefinition[] = [
     icon: BadgeCheck,
     permissions: ["guide_profile:update", "tour:create", "booking:read"],
     onboardingFields: ["languages", "destinations", "experienceYears"],
+    isBusiness: false,
   },
   {
     id: "food_expert",
@@ -118,6 +175,7 @@ export const roleDefinitions: RoleDefinition[] = [
     icon: Utensils,
     permissions: ["food_trail:create", "restaurant:review", "recommendation:create"],
     onboardingFields: ["city", "cuisineSpecialty", "portfolioLink"],
+    isBusiness: false,
   },
   {
     id: "emergency_response",
@@ -128,6 +186,14 @@ export const roleDefinitions: RoleDefinition[] = [
     icon: LifeBuoy,
     permissions: ["emergency:read", "emergency:update", "safety_alert:create"],
     onboardingFields: ["organizationName", "designation", "verificationId"],
+    isBusiness: true,
+    designations: [
+      { value: "director", label: "Director" },
+      { value: "team_lead", label: "Team Lead" },
+      { value: "coordinator", label: "Coordinator" },
+      { value: "officer", label: "Officer" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     id: "admin",
@@ -138,6 +204,7 @@ export const roleDefinitions: RoleDefinition[] = [
     icon: Shield,
     permissions: ["admin:all", "role:assign", "partner:verify", "content:moderate"],
     onboardingFields: ["internalAccessCode"],
+    isBusiness: false,
   },
 ];
 
@@ -154,6 +221,7 @@ export const followTargetTypes = [
   "hotel",
   "hostel",
   "cafe",
+  "restaurant",
   "sim_outlet",
   "tour_guide",
   "food_expert",
@@ -162,35 +230,6 @@ export const followTargetTypes = [
   "tour_package",
 ] as const;
 
-export const tursoSchemaPreview = `users
-- id
-- clerk_user_id
-- display_name
-- email
-- active_role
-- created_at
-
-user_roles
-- id
-- user_id
-- role
-- status
-
-follows
-- id
-- follower_user_id
-- target_type
-- target_id
-- created_at
-
-partner_profiles
-- id
-- user_id
-- role
-- business_name
-- verification_status
-- metadata_json`;
-
 export const getRoleDefinition = (role: UserRole) =>
   roleDefinitions.find((definition) => definition.id === role);
 
@@ -198,3 +237,22 @@ export const can = (role: UserRole, permission: string) => {
   const definition = getRoleDefinition(role);
   return Boolean(definition?.permissions.includes("admin:all") || definition?.permissions.includes(permission));
 };
+
+export const pakistanProvinces = [
+  "Punjab",
+  "Sindh",
+  "Khyber Pakhtunkhwa",
+  "Balochistan",
+  "Gilgit-Baltistan",
+  "Azad Jammu & Kashmir",
+  "Islamabad Capital Territory",
+] as const;
+
+export const pakistanCities = [
+  "Islamabad", "Rawalpindi", "Lahore", "Karachi", "Faisalabad", "Multan",
+  "Peshawar", "Quetta", "Sialkot", "Gujranwala", "Hyderabad", "Sukkur",
+  "Murree", "Naran", "Hunza", "Skardu", "Gilgit", "Swat",
+  "Mardan", "Abbottabad", "Bahawalpur", "Sargodha", "Sheikhupura",
+  "Mirpur", "Muzaffarabad", "Gwadar", "Chitral", "Fairy Meadows",
+  "Deosai", "Kashmir", "Larkana", "Thatta", "Nawabshah",
+] as const;

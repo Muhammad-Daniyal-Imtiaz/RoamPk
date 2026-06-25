@@ -1,14 +1,13 @@
 "use server";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { partnerProfiles, userRoles, users } from "@/db/schema";
 import { syncCurrentUser } from "@/db/queries/users";
 import { getRoleDefinition, type UserRole } from "@/lib/roles";
-
-const createId = (prefix: string) => `${prefix}_${crypto.randomUUID()}`;
+import { createId } from "@/lib/id";
 
 export async function completeOnboarding(formData: FormData) {
   const role = formData.get("role") as UserRole;
@@ -18,15 +17,26 @@ export async function completeOnboarding(formData: FormData) {
     throw new Error("Invalid role selected");
   }
 
-  const { userId: clerkUserId } = await auth();
-  if (!clerkUserId) {
-    redirect("/sign-in");
-  }
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) redirect("/sign-in");
 
   const dbUser = await syncCurrentUser(role);
-  if (!dbUser) {
-    redirect("/sign-in");
-  }
+  if (!dbUser) redirect("/sign-in");
+
+  const updateData: Record<string, unknown> = {};
+
+  const bio = formData.get("bio");
+  if (bio) updateData.bio = bio;
+
+  const city = formData.get("city");
+  if (city) updateData.city = city;
+
+  const province = formData.get("province");
+  if (province) updateData.province = province;
+
+  const about = formData.get("about");
+  if (about) updateData.about = about;
 
   await db
     .insert(userRoles)
@@ -53,11 +63,18 @@ export async function completeOnboarding(formData: FormData) {
     })
     .where(eq(users.id, dbUser.id));
 
-  if (roleDefinition.category === "partner" || roleDefinition.category === "operator") {
-    const businessName =
-      String(formData.get("businessName") ?? "") ||
-      String(formData.get("organizationName") ?? "") ||
-      `${dbUser.displayName} ${roleDefinition.label}`;
+  const isBusiness = roleDefinition.isBusiness;
+
+  if (isBusiness) {
+    const businessName = String(formData.get("businessName") ?? "");
+    const designation = formData.get("designation") as string | null;
+    const designationOther = formData.get("designationOther") as string | null;
+    const contactPhone = String(formData.get("contactPhone") ?? "");
+    const address = String(formData.get("address") ?? "");
+    const area = String(formData.get("area") ?? "");
+    const website = String(formData.get("website") ?? "");
+    const proofImageUrl = String(formData.get("proofImageUrl") ?? "");
+    const proofType = formData.get("proofType") as string | null;
 
     await db
       .insert(partnerProfiles)
@@ -65,34 +82,43 @@ export async function completeOnboarding(formData: FormData) {
         id: createId("partner"),
         userId: dbUser.id,
         role,
-        businessName,
-        contactPhone: String(formData.get("phone") ?? ""),
+        businessName: businessName || `${dbUser.name} ${roleDefinition.label}`,
+        designation: (designation && designation !== "other" ? designation : null) as typeof partnerProfiles.designation,
+        designationOther: designation === "other" ? designationOther : null,
+        contactPhone,
         city: String(formData.get("city") ?? ""),
-        address: String(formData.get("address") ?? ""),
+        address,
+        province: String(formData.get("province") ?? ""),
+        area,
+        about: String(formData.get("about") ?? ""),
+        isBusiness: true,
+        website,
+        proofImageUrl: proofImageUrl || null,
+        proofType: (proofType as typeof partnerProfiles.proofType) || null,
         verificationStatus: "pending",
         metadataJson: Object.fromEntries(formData.entries()),
       })
       .onConflictDoUpdate({
         target: [partnerProfiles.userId, partnerProfiles.role],
         set: {
-          businessName,
-          contactPhone: String(formData.get("phone") ?? ""),
+          businessName: businessName || `${dbUser.name} ${roleDefinition.label}`,
+          designation: (designation && designation !== "other" ? designation : null) as typeof partnerProfiles.designation,
+          designationOther: designation === "other" ? designationOther : null,
+          contactPhone,
           city: String(formData.get("city") ?? ""),
-          address: String(formData.get("address") ?? ""),
+          address,
+          province: String(formData.get("province") ?? ""),
+          area,
+          about: String(formData.get("about") ?? ""),
+          website,
+          proofImageUrl: proofImageUrl || null,
+          proofType: (proofType as typeof partnerProfiles.proofType) || null,
           verificationStatus: "pending",
           metadataJson: Object.fromEntries(formData.entries()),
           updatedAt: new Date().toISOString(),
         },
       });
   }
-
-  const client = await clerkClient();
-  await client.users.updateUserMetadata(clerkUserId, {
-    publicMetadata: {
-      activeRole: role,
-      onboardingComplete: true,
-    },
-  });
 
   redirect("/dashboard");
 }

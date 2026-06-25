@@ -1,17 +1,16 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { userRoles, users } from "@/db/schema";
 import type { UserRole } from "@/lib/roles";
-
-const createId = (prefix: string) => `${prefix}_${crypto.randomUUID()}`;
+import { createId } from "@/lib/id";
 
 export async function getCurrentDbUser() {
-  const { userId } = await auth();
-  if (!userId) return null;
+  const session = await auth();
+  if (!session?.user?.id) return null;
 
   const existing = await db.query.users.findFirst({
-    where: eq(users.clerkUserId, userId),
+    where: eq(users.id, session.user.id),
     with: { roles: true },
   });
 
@@ -19,26 +18,25 @@ export async function getCurrentDbUser() {
 }
 
 export async function syncCurrentUser(defaultRole: UserRole = "tourist") {
-  const clerkUser = await currentUser();
-  if (!clerkUser) return null;
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return null;
 
   const existing = await db.query.users.findFirst({
-    where: eq(users.clerkUserId, clerkUser.id),
+    where: eq(users.id, userId),
     with: { roles: true },
   });
 
   if (existing) return existing;
 
-  const userId = createId("usr");
-  const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
-  const displayName = clerkUser.fullName ?? clerkUser.username ?? email.split("@")[0] ?? "RoamPK User";
+  const email = session.user?.email ?? "";
+  const name = session.user?.name ?? email.split("@")[0] ?? "RoamPK User";
 
   await db.insert(users).values({
     id: userId,
-    clerkUserId: clerkUser.id,
+    name,
     email,
-    displayName,
-    imageUrl: clerkUser.imageUrl,
+    image: session.user?.image,
     activeRole: defaultRole,
   });
 
@@ -54,35 +52,33 @@ export async function syncCurrentUser(defaultRole: UserRole = "tourist") {
     with: { roles: true },
   });
 }
-export async function promoteUserToAdmin(targetUserId: string) {
-  // 1️⃣ Ensure the caller is an admin
-  const { userId: callerId } = await auth();
-  if (!callerId) throw new Error('Unauthenticated');
 
-  // Verify caller's role is admin
+export async function promoteUserToAdmin(targetUserId: string) {
+  const session = await auth();
+  const callerId = session?.user?.id;
+  if (!callerId) throw new Error("Unauthenticated");
+
   const caller = await db.query.users.findFirst({
     where: eq(users.id, callerId),
     with: { roles: true },
   });
-  if (!caller) throw new Error('Caller not found');
-  const callerIsAdmin = caller.roles.some((r) => r.role === 'admin' && r.status === 'active');
-  if (!callerIsAdmin) throw new Error('Forbidden: only admins can promote');
+  if (!caller) throw new Error("Caller not found");
 
-  // 2️⃣ Update the target user's active_role field
+  const callerIsAdmin = caller.roles.some((r) => r.role === "admin" && r.status === "active");
+  if (!callerIsAdmin) throw new Error("Forbidden: only admins can promote");
+
   await db
     .update(users)
-    .set({ activeRole: 'admin' })
+    .set({ activeRole: "admin" })
     .where(eq(users.id, targetUserId));
 
-  // 3️⃣ Insert the admin role assignment with status "active"
   await db.insert(userRoles).values({
-    id: createId('urole'),
+    id: createId("urole"),
     userId: targetUserId,
-    role: 'admin',
-    status: 'active',
+    role: "admin",
+    status: "active",
   });
 
-  // Return the updated user (including new role)
   return db.query.users.findFirst({
     where: eq(users.id, targetUserId),
     with: { roles: true },

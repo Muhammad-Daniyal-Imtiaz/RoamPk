@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton, useUser } from "@clerk/nextjs";
-import { Menu, Moon, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { LogOut, LayoutDashboard, Menu, Moon, User, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,10 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(true);
-  const { isSignedIn } = useUser();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const isSignedIn = status === "authenticated";
+
   return (
     <header className={cn("fixed inset-x-0 top-0 z-40 border-b border-white/10", dark ? "bg-[#101510]/90 text-white" : "glass")}>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
@@ -45,12 +48,32 @@ export function Navbar() {
             </Link>
           )}
           {isSignedIn && (
-            <>
-              <Link href="/dashboard" className="hidden sm:block">
-                <Button size="sm">Dashboard</Button>
-              </Link>
-              <UserButton />
-            </>
+            <div className="relative hidden sm:block">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-2 rounded-full bg-[#1a201a] px-3 py-1.5 text-sm font-semibold hover:bg-[#006600]/20"
+              >
+                {session.user?.image ? (
+                  <img src={session.user.image} alt="" className="h-7 w-7 rounded-full object-cover" />
+                ) : (
+                  <User className="h-5 w-5" />
+                )}
+                <span>{session.user?.name?.split(" ")[0] || "User"}</span>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-white/10 bg-[#1a201a] p-2 shadow-2xl">
+                  <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-[#006600]/10">
+                    <LayoutDashboard className="h-4 w-4" /> Dashboard
+                  </Link>
+                  <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-[#006600]/10">
+                    <User className="h-4 w-4" /> Profile
+                  </Link>
+                  <button onClick={() => signOut()} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-red-400 hover:bg-red-400/10">
+                    <LogOut className="h-4 w-4" /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           )}
           <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Open menu">
             {open ? <X /> : <Menu />}
@@ -64,6 +87,16 @@ export function Navbar() {
               {label}
             </Link>
           ))}
+          {isSignedIn && (
+            <>
+              <Link href="/dashboard" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-semibold hover:bg-[#006600]/10">Dashboard</Link>
+              <Link href="/profile" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-semibold hover:bg-[#006600]/10">Profile</Link>
+              <button onClick={() => signOut()} className="rounded-xl px-4 py-3 text-left font-semibold text-red-400 hover:bg-red-400/10">Sign Out</button>
+            </>
+          )}
+          {!isSignedIn && (
+            <Link href="/sign-up" onClick={() => setOpen(false)} className="rounded-xl bg-[#006600] px-4 py-3 text-center font-black text-white">Join RoamPK</Link>
+          )}
         </div>
       )}
     </header>

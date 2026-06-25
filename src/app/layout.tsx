@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "@/components/session-provider";
 
 export const metadata: Metadata = {
   title: "RoamPK | Pakistan Tourism Super-App",
-  description: "Investor-ready UI demo for hotels, SIM cards, exchange rates, tours, destinations, and route maps in Pakistan.",
+  description: "Book hotels, get tourist SIM, exchange currency, find guides — all in one place.",
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <SessionProvider>
       <html lang="en">
         <body className="bg-[#111511] text-gray-300 antialiased">
           <Navbar />
@@ -27,6 +27,6 @@ export default function RootLayout({
           <Toaster />
         </body>
       </html>
-    </ClerkProvider>
+    </SessionProvider>
   );
 }

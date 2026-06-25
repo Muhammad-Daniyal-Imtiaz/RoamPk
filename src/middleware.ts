@@ -1,31 +1,24 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/onboarding(.*)", "/admin(.*)"]);
+export default auth((req) => {
+  const path = req.nextUrl.pathname;
+  const isLoggedIn = !!req.auth;
 
-export default clerkMiddleware(async (auth, request) => {
-  if (isProtectedRoute(request)) {
-    await auth.protect();
-    // Additional admin role check for /admin routes
-    if (request.nextUrl.pathname.startsWith('/admin')) {
-      const { userId } = auth;
-      if (!userId) {
-        return new Response('Unauthorized', { status: 401 });
-      }
-      // Pull user role from DB
-      const { db } = await import('@/db/client');
-      const { users } = await import('@/db/schema');
-      const user = await db.select().from(users).where(users.id.eq(userId)).limit(1);
-      const role = user?.[0]?.active_role;
-      if (role !== 'admin') {
-        return new Response('Forbidden: Admins only', { status: 403 });
-      }
-    }
+  const protectedPaths = ["/dashboard", "/onboarding", "/admin", "/profile"];
+  const isProtected = protectedPaths.some((p) => path === p || path.startsWith(p + "/"));
+
+  if (isProtected && !isLoggedIn) {
+    const signInUrl = new URL("/sign-in", req.url);
+    signInUrl.searchParams.set("callbackUrl", path);
+    return NextResponse.redirect(signInUrl);
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|uploads|api/auth).*)",
   ],
 };
