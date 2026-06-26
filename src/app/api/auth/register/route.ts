@@ -8,8 +8,8 @@ export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
 
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
     if (password.length < 8) {
@@ -21,15 +21,16 @@ export async function POST(req: Request) {
     });
 
     if (existing) {
-      return NextResponse.json({ error: "Email already registered" }, { status: 409 });
+      return NextResponse.json({ alreadyExists: true }, { status: 200 });
     }
 
     const hashedPassword = await hash(password, 12);
     const userId = createId("usr");
+    const displayName = name || email.split("@")[0];
 
     await db.insert(users).values({
       id: userId,
-      name,
+      name: displayName,
       email,
       password: hashedPassword,
       activeRole: "tourist",

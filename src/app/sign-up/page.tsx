@@ -1,27 +1,37 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [accountExistsMessage, setAccountExistsMessage] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      router.push("/dashboard");
+    }
+  }, [status, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setAccountExistsMessage("");
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -29,13 +39,61 @@ export default function SignUpPage() {
       body: JSON.stringify({ name, email, password }),
     });
 
+    const data = await res.json();
+
+    if (data.alreadyExists) {
+      // Account exists, try to auto-login
+      setAccountExistsMessage("Account already exists! Attempting to sign you in...");
+      
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        // Password doesn't match
+        setLoading(false);
+        setAccountExistsMessage("");
+        setError(
+          "You already have an account with this email. The password you entered doesn't match. Please use the correct password or reset it."
+        );
+        // Redirect to sign-in after 3 seconds
+        setTimeout(() => {
+          router.push(`/sign-in?email=${encodeURIComponent(email)}`);
+        }, 3000);
+        return;
+      }
+
+      // Successfully logged in, check onboarding status
+      const checkResponse = await fetch("/api/onboarding/check");
+      const checkData = await checkResponse.json();
+      
+      if (checkData.onboardingComplete) {
+        // User has completed onboarding, go to dashboard
+        setAccountExistsMessage("Welcome back! Redirecting to your dashboard...");
+        setTimeout(() => {
+          router.push("/dashboard");
+          router.refresh();
+        }, 1500);
+      } else {
+        // User hasn't completed onboarding, send to onboarding
+        setAccountExistsMessage("Welcome back! Completing your profile setup...");
+        setTimeout(() => {
+          router.push("/onboarding");
+          router.refresh();
+        }, 1500);
+      }
+      return;
+    }
+
     if (!res.ok) {
-      const data = await res.json();
       setError(data.error || "Something went wrong");
       setLoading(false);
       return;
     }
 
+    // New account created, sign in
     const result = await signIn("credentials", {
       email,
       password,
@@ -48,6 +106,7 @@ export default function SignUpPage() {
       return;
     }
 
+    // New user should go to onboarding to complete profile
     router.push("/onboarding");
     router.refresh();
   };
@@ -100,7 +159,7 @@ export default function SignUpPage() {
                   placeholder="Muhammad Ali"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -111,6 +170,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -123,24 +183,36 @@ export default function SignUpPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={8}
+                    disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 disabled:opacity-50"
+                    disabled={loading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
+              {accountExistsMessage && (
+                <div className="flex items-start gap-2 rounded-lg border border-green-500/20 bg-green-500/5 p-3 text-sm text-green-400">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{accountExistsMessage}</span>
+                </div>
+              )}
+
               {error && (
-                <p className="text-sm font-semibold text-red-400">{error}</p>
+                <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-400">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
               )}
 
               <Button type="submit" size="lg" disabled={loading} className="w-full">
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? "Please wait..." : "Create Account"}
               </Button>
             </form>
 
